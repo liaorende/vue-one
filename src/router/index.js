@@ -15,7 +15,7 @@ export default new Router({
       children: [
         {
           path: '',
-          redirect: '/ONE'
+          redirect: 'ONE'
         },
         {
           path: '/ONE',
