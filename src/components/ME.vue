@@ -22,6 +22,7 @@ export default {
   height: 12.35rem;
   overflow: hidden;
   background: url(../assets/img/colored_bg_image.png) no-repeat;
+  background-size: cover;
 }
 
 .login {

@@ -1,56 +1,99 @@
 <template>
   <div id="app">
-    <router-view></router-view>
-    <footer id="footer"></footer>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive"></router-view>
+    </keep-alive>
+    <mini-player :show="show" @showPlayer="showPlayer"></mini-player>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
+    <!-- <audio ref="audio" :src="audioSrc" @timeupdate="timeupdate"></audio> -->
+    <img @click="showPlayer(true)" class="miniBackstage" src="./assets/img/MusicFeedsPlaceHolder@2x.png" alt="">
+    <!-- <footer id="footer"></footer> -->
   </div>
 </template>
 
 <script>
-var html = document.documentElement;
-var width = html.clientWidth;
-html.style.fontSize = width / 7.5 + "px";
+(function(doc, win) {
+  var docEl = doc.documentElement,
+    resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+    recalc = function() {
+      var clientWidth = docEl.clientWidth > 750 ? 750 : docEl.clientWidth;
+      if (!clientWidth) { return };
+      docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+    };
+  recalc();
+  if (!doc.addEventListener) return;
+  win.addEventListener(resizeEvt, recalc, false);
+  doc.addEventListener('DOMContentLoaded', recalc, false);
+})(document, window)
+
+import miniPlayer from './components/miniPlayer'
 export default {
-  name: 'app'
+  name: 'app',
+  data() {
+    return {
+      nav: ['ONE', 'ALL', 'ME'],
+      show: false
+    }
+  },
+  components: {
+    miniPlayer
+  },
+  methods: {
+    showPlayer(v) {
+      this.show = v
+    },
+  }
 }
 </script>
 
 <style>
-body,
-p {
-  margin: 0
-}
-
-h1,
-h2,
-h3,
-h4 {
-  margin: 0;
-  font-weight: normal;
-}
-
-a {
-  text-decoration: none;
-}
-
-img {
-  vertical-align: top;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-body {
-  background: #eee;
-}
-
-#footer {
+@import url('assets/css/common.scss');
+.navTabs {
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #b2b2b2;
   height: 0.98rem;
+  width: 100%;
+  background: #fefefe;
 }
 
-.mt20 {
-  margin-top: 0.2rem;
+.navTabs>li {
+  display: inline-block;
+  width: 33.3%;
+}
+
+.navTabs>li>a {
+  display: inline-block;
+  width: 100%;
+  height: 0;
+  padding-top: 0.98rem;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+.navTabs .ONE {
+  background: url(./assets/img/homeSelectedV4@2x.png) no-repeat center;
+  background-size: 0.8rem
+}
+
+.navTabs .ALL {
+  background: url(./assets/img/allUnselectedV4@2x.png) no-repeat center;
+  background-size: 0.8rem
+}
+
+.navTabs .ME {
+  background: url(./assets/img/meUnselectedV4@2x.png) no-repeat center;
+  background-size: 0.8rem
+}
+
+
+.miniBackstage {
+  position: fixed;
+  top: 2rem;
+  right: -10px;
+  z-index: 998;
+  width: 40px;
 }
 </style>

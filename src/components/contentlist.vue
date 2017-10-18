@@ -5,8 +5,10 @@
         <p class="title">- {{titles[index]}} -</p>
         <p class="name">{{item.title}}</p>
         <p class="author">{{item.author.user_name}}</p>
-        <div v-if="item.content_type==4" class="music">
-          <img class="picture" :src="item.img_url" alt="">
+        <div v-if="item.category==4" class="music">
+          <span :class="{'playicon':isPlay,'pauseicon':!isPlay}" @click="playMusic"></span>
+          <img class="picture" :src="item.img_url" :style="{transform:'rotate('+timerCount+'deg)'}">
+          <audio src="#"></audio>
         </div>
         <div v-else>
           <img class="picture" :src="item.img_url" alt="">
@@ -34,6 +36,28 @@ export default {
   props: ['datas', 'titles'],
   data() {
     return {
+      isPlay: true,
+      timerCount: 0,
+      timerInterval: null
+    }
+  },
+  methods: {
+    playMusic() {
+      let music = document.querySelector('.music');
+      let audio = music.querySelector('audio');
+      let img = music.querySelector('.picture');
+      if (this.isPlay) {
+        audio.play();
+        this.timerInterval = setInterval(() => {
+          this.timerCount++;
+          //img.style.transform = `rotate(${this.timerCount}deg)`;
+        }, 32)
+      } else {
+        audio.pause();
+        clearInterval(this.timerInterval);
+      }
+      this.isPlay = !this.isPlay
+      console.log(audio)
     }
   }
 }
@@ -42,6 +66,7 @@ export default {
 <style scoped>
 .contentlist {
   padding: 0 0.4rem;
+  border-top: .2rem solid #eee;
   background: #fff;
 }
 
@@ -67,16 +92,45 @@ export default {
   height: 4rem;
 }
 
-.contentlist .music img {
+.contentlist .music {
+  position: relative;
   width: 4rem;
   height: 4rem;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 50%
+}
+
+.contentlist .music>span {
+  position: absolute;
+  left: calc( 50% - .4rem);
+  top: calc( 50% - .4rem);
+  width: .8rem;
+  height: .8rem;
+  border-radius: 50%;
+  z-index: 999;
+}
+
+.contentlist .music .playicon {
+  background: rgba(0, 0, 0, .5) url('../assets/img/audioPlayIcon@2x.png') no-repeat .25rem;
+  background-size: .3rem
+}
+
+.contentlist .music .pauseicon {
+  background: rgba(0, 0, 0, .5) url('../assets/img/audioPauseIcon@2x.png') no-repeat .25rem;
+  background-size: .3rem
+}
+
+.contentlist .music img {
+  width: 100%;
+  height: 100%;
 }
 
 .contentlist .text {
   color: #808080;
   width: 5.9rem;
   font-size: 0.28rem;
-  line-height: 0.70rem;
+  line-height: 0.56rem;
 }
 
 .fn {
@@ -118,5 +172,10 @@ export default {
 .contentlist .fn>p {
   padding: 0;
   margin: 0
+}
+
+.rotation-enter-active {
+  transition: all 1s linear;
+  transform: rotate(60deg);
 }
 </style>

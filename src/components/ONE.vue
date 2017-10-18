@@ -1,12 +1,12 @@
 <template>
-  <div class="ONE">
+  <div class="ONE" v-if="datas">
     <header class="header">
       <div class="date">
-        <p>2017</p>
+        <p>{{times[0]}}</p>
         <span>/</span>
-        <p>08</p>
+        <p>{{times[1]}}</p>
         <span>/</span>
-        <p>08</p>
+        <p>{{times[2]}}</p>
       </div>
       <p class="local">
         <span>地球</span>
@@ -16,7 +16,7 @@
     </header>
     <section class="content">
       <div class="illustr">
-        <img class="picture" :src="img" alt="">
+        <img class="picture" :src="datas.content_list[0].img_url" alt="">
         <p class="name">{{datas.content_list[0].title}}
           <span>|</span>{{datas.content_list[0].pic_info}}</p>
         <p class="text">{{datas.content_list[0].forward}}</p>
@@ -39,55 +39,77 @@
       </div>
     </section>
     <div class="column">
-      <p class="title">一个VOL.{{datas.menu.vol}}</p>
-      <ul class="list">
-        <li v-for="(item,index) in datas.menu.list" :key="index">
-          <span>{{titles[index]}}</span>
-          <p class="text">{{item.title}}</p>
-        </li>
-      </ul>
+      <p class="title" @click="spreadView">一个VOL.{{datas.menu.vol}}</p>
+      <transition name="spread" @enter="enter" @leave="leave">
+        <transition-group name="flip-list" tag="ul" class="list" :style="{height:spread?viewHeight:0}">
+          <li v-for="(item,index) in datas.menu.list" :key="index" :class="{'spreadLi':!spread}" @click="gotoAddress({path:'/' + type[item.content_type-1],query:{id:item.content_id}})">
+            <span>{{titlesCategory(item)}}</span>
+            <p class="text">{{item.title}}</p>
+          </li>
+        </transition-group>
+      </transition>
     </div>
     <content-list :datas="datas" :titles="titles"></content-list>
   </div>
 </template>
+
 <script>
 import contentList from './contentlist';
+import { getNowDatas, getDateDatas } from '../service/getData';
 export default {
   name: 'ONE',
-
+  props: ['aaa'],
   data() {
     return {
-      datas: {
-        content_list: {
-
-        }
-      },
-      img: '',
+      datas: '',
+      date: '',
       dataId: [],
-      titles: ["ONE STORY", "阅读", "连载", "问答", "音乐", "影视", "电台"]
+      titles: ["ONE STORY", "阅读", "连载", "问答", "音乐", "影视", '', '', "电台"],
+      type: ['essay', 'serial', 'question', 'music', 'movie'],// 未完善
+      spread: false
     }
   },
   components: {
     contentList
   },
-  mounted() {
-    const idlist = 'http://v3.wufazhuce.com:8000/api/onelist/idlist/?';
-    fetch(idlist).then(response => {
-      return response.json();
-    }).then(result => {
-      this.dataId = (result.data)
-      let url = 'http://v3.wufazhuce.com:8000/api/onelist/' + this.dataId[1] + '/0?';
-      fetch(url).then(response => {
-        return response.json();
-      }).then(result => {
-        console.log(result);
-        this.datas = result.data
-        this.img = result.data.content_list[0].img_url
-      })
+  methods: {
+    spreadView(e) {
+      this.spread = !this.spread;
+    },
+    gotoAddress(path) {
+      if (this.spread) {
+        this.$router.push(path);
+      }
+    },
+    enter(el, done) {
+      el.style.height = viewHeight;
+    },
+    leave(el, done) {
+      el.style.height = '0px';
+    },
+    titlesCategory(data) {
+      if (data.tag) {
+        return data.tag.title
+      }
+      return this.titles[data.content_type]
+    }
+  },
+  created() {
+    getNowDatas().then(res => {
+      this.datas = res.data;
+      this.date = res.data.weather.date;
+      console.log('res', res);
     })
+  },
+  computed: {
+    times() {
+      return this.date.split('-')
+    },
+    viewHeight() {
+      return (this.datas.menu.list.length * 55) * 2 / 100 + 'rem';
+    }
   }
 }
-
 </script>
 
 <style scoped>
@@ -99,7 +121,7 @@ export default {
 
 .header .date {
   font-size: 0.4rem;
-  line-height: 0.8rem;
+  line-height: 0.76rem;
   text-align: center;
 }
 
@@ -191,7 +213,8 @@ export default {
 }
 
 .column {
-  margin-top: 0.2rem;
+  position: relative;
+  border-top: .2rem solid #eee;
   line-height: 0.8rem;
   background: #fff;
 }
@@ -201,11 +224,18 @@ export default {
   height: 0.8rem;
   font-size: 0.26rem;
   color: #ccc;
+  position: relative;
+  z-index: 99;
+}
+
+.column .list {
+  transition: all .4s;
 }
 
 .list>li {
-  height: 1.1rem;
-  padding-left: 0.82rem;
+  margin-bottom: .33rem;
+  padding-left: 0.62rem;
+  transition: all .4s;
 }
 
 .list>li>span {
@@ -217,5 +247,18 @@ export default {
 .list>li>.text {
   font-size: 0.26rem;
   line-height: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list .spreadLi {
+  position: absolute;
+  top: 0;
+  opacity: 0;
+}
+
+.spread-enter-active {
+  transition: all .4s;
 }
 </style>
