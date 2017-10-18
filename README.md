@@ -1,6 +1,6 @@
-# vue
+# vue.js仿ONE(一个)APP
 
-> A Vue.js project
+> 
 
 ## Build Setup
 
