@@ -5,8 +5,14 @@
         </transition>
         <transition name="drop">
             <div v-show="show" class="miniPlayer">
-                <p class="audioName">附近的人</p>
+                <!-- <p class="audioName">附近的人</p> -->
                 <audio ref="audio" :src="audioSrc" @timeupdate="timeupdate"></audio>
+                <div class="progress">
+                    <div class="progress-bar"></div>
+                    <span class="progress-bar-ball"></span>
+                    <span class="currentTime">--:--</span>
+                    <span class="totalTime">--:--</span>
+                </div>
             </div>
         </transition>
     </div>
@@ -83,11 +89,38 @@ export default {
 
 .miniPlayer {
     position: fixed;
-    top: 0;
+    box-sizing: border-box;
     width: 100%;
+    top: 0;
     height: 3.66rem;
     z-index: 999;
     background: #fff;
+    padding: .2rem .24rem;
+    .progress {
+        position: relative;
+        height: 3rem;
+        font-size: .17rem;
+        .progress-bar {
+            width: 100%;
+            height: 0.04rem;
+            background: #eee;
+            margin-bottom: .2rem;
+        }
+        .progress-bar-ball {
+            position: absolute;
+            top: 0;
+            width: .15rem;
+            height: .15rem;
+            border-radius: 50%;
+            background: #000;
+        }
+        .currentTime {
+            float: left;
+        }
+        .totalTime {
+            float: right;
+        }
+    }
 }
 
 .opc-enter-active,
