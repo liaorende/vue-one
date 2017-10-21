@@ -5,13 +5,21 @@
         </transition>
         <transition name="drop">
             <div v-show="show" class="miniPlayer">
-                <!-- <p class="audioName">附近的人</p> -->
-                <audio ref="audio" :src="audioSrc" @timeupdate="timeupdate"></audio>
+                <audio ref="audio" :src="audioSrc" @timeupdate="timeupdate" @playing="totalTime"></audio>
+                <p class="audioName">{{audioAuthor}}</p>
                 <div class="progress">
                     <div class="progress-bar"></div>
-                    <span class="progress-bar-ball"></span>
-                    <span class="currentTime">--:--</span>
-                    <span class="totalTime">--:--</span>
+                    <div class="progress-already-bar" :style="{width:alreadyPlay}">
+                        <span class="progress-bar-ball"></span>
+                    </div>
+                    <span class="currentTime">{{currentTime||'--:--'}}</span>
+                    <span class="totalTime">{{duration||'--:--'}}</span>
+                </div>
+                <p class="audioAuthor">{{audioName}}</p>
+                <div class="control">
+                    <span class="before"></span>
+                    <span :class="{currentPlay:playStatus, currentPause:!playStatus}" @click="playAudio"></span>
+                    <span class="after"></span>
                 </div>
             </div>
         </transition>
@@ -20,10 +28,14 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import { add2Zero } from '../base/utils'
 export default {
     data() {
         return {
-            // show: false
+            currentTime: '',
+            duration: '',
+            alreadyPlay: '',
+            playStatus: false
         }
     },
     props: {
@@ -40,17 +52,31 @@ export default {
             'GET_AUDIO_CURRENTTIME', 'MUSIC_AUDIO_STATUS', 'READ_AUDIO_STATUS'
         ]),
         timeupdate() {
+            this.alreadyPlay = (this.$refs.audio.currentTime / this.$refs.audio.duration) * 100 + '%';
+            this.currentTime = add2Zero(Math.floor(this.$refs.audio.currentTime))
             if (!this.readAudioStatus) return;
             this.GET_AUDIO_CURRENTTIME(this.$refs.audio.currentTime)
         },
         hideView() {
             this.$emit('showPlayer', false)
+        },
+        totalTime() {
+            this.duration = add2Zero(Math.floor(this.$refs.audio.duration))
+        },
+        playAudio() {
+            this.$refs.audio.paused ? this.$refs.audio.play() : this.$refs.audio.pause()
+            this.playStatus = this.$refs.audio.paused;
         }
     },
     computed: {
         ...mapState([
-            'audioSrc', 'musicAudioStatus', 'readAudioStatus'
-        ])
+            'audioSrc', 'audioName', 'audioAuthor', 'musicAudioStatus', 'readAudioStatus'
+        ]),
+        // currentBar() {
+        //     if (this.$refs.audio.currentTime) {
+        //         return Math.floor(this.$refs.audio.currentTime / this.$refs.audio.duration) * 100 + '%'
+        //     }
+        // }
     },
     watch: {
         musicAudioStatus() {
@@ -72,6 +98,9 @@ export default {
             } else {
                 this.$refs.audio.pause()
             }
+        },
+        playStatus() {
+
         }
     },
 }
@@ -96,9 +125,20 @@ export default {
     z-index: 999;
     background: #fff;
     padding: .2rem .24rem;
+    .audioName {
+        text-align: center;
+        font-size: .25rem;
+        margin-bottom: .36rem;
+        color: #737373;
+    }
+    .audioAuthor {
+        text-align: center;
+        font-size: .23rem;
+        color: #737373;
+        margin-bottom: .6rem;
+    }
     .progress {
         position: relative;
-        height: 3rem;
         font-size: .17rem;
         .progress-bar {
             width: 100%;
@@ -106,19 +146,51 @@ export default {
             background: #eee;
             margin-bottom: .2rem;
         }
-        .progress-bar-ball {
+        .progress-already-bar {
             position: absolute;
             top: 0;
-            width: .15rem;
-            height: .15rem;
-            border-radius: 50%;
-            background: #000;
-        }
-        .currentTime {
-            float: left;
+            height: 0.04rem;
+            background-color: #000;
+            .progress-bar-ball {
+                position: absolute;
+                top: -0.05rem;
+                right: 0;
+                width: .15rem;
+                height: .15rem;
+                border-radius: 50%;
+                background: #000;
+            }
         }
         .totalTime {
             float: right;
+        }
+    }
+    .control {
+        width: 100%;
+        text-align: center;
+        font-size: 0;
+        img {
+            width: .43rem;
+        }
+        span {
+            width: .43rem;
+            height: .43rem;
+            background-size: .43rem .43rem;
+            display: inline-block;
+        }
+        .before {
+            background-image: url('../assets/img/MusicBarPreviousDisable@2x.png');
+        }
+        .currentPlay {
+            background-image: url('../assets/img/MusicBarPlay@2x.png');
+            margin: 0 .7rem;
+        }
+        .currentPause {
+            background-image: url('../assets/img/MusicBarPause@2x.png');
+            margin: 0 .7rem;
+        }
+        .after {
+            background-image: url('../assets/img/MusicBarNextDisable@2x.png')
         }
     }
 }

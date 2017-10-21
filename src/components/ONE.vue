@@ -100,6 +100,11 @@ export default {
       this.date = res.data.weather.date;
       console.log('res', res);
     })
+    // getDateDatas('2017-10-20').then(res => {
+    //   this.datas = res.data;
+    //   this.date = res.data.weather.date;
+    //   console.log('res', res);
+    // })
   },
   computed: {
     times() {

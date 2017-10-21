@@ -8,6 +8,8 @@ Vue.use(Vuex)
 
 const state = {
     audioSrc: '', // 音频src
+    audioName: '',
+    audioAuthor: '',
     musicAudioStatus: false,
     readAudioStatus: false,
     audioCurrentTime: ''

@@ -44,7 +44,8 @@ export default {
             discuss: '',
             timeCount: 0,
             show: false,
-            music: 'https://m128.xiami.net/263/7263/2102736824/1795811213_1493002977979.mp3'
+            music: 'https://m128.xiami.net/263/7263/2102736824/1795811213_1493002977979.mp3',
+
         }
     },
     created() {
@@ -61,7 +62,7 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'GAIN_AUDIO', 'MUSIC_AUDIO_STATUS'
+            'GAIN_AUDIO', 'GAIN_AUDIO_NAME', 'GAIN_AUDIO_AUTHOR', 'MUSIC_AUDIO_STATUS'
         ]),
         initData() {
             this.content_id = this.$route.query.id;
@@ -79,6 +80,8 @@ export default {
         },
         playMusic() {
             this.GAIN_AUDIO(this.music)
+            this.GAIN_AUDIO_NAME(this.data.author.user_name)
+            this.GAIN_AUDIO_AUTHOR(this.data.title)
             this.MUSIC_AUDIO_STATUS(!this.musicAudioStatus)
         },
         _show(v) {

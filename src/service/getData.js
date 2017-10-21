@@ -18,21 +18,26 @@ const parameter = '?channel=wdj&source=summary&source_id=9245&version=4.0.2&uuid
 //     8:电台
 // }
 /**
- * 获取essay页面文本内容
+ * 获取 <阅读> 数据
  */
 export const essayContent = id => fetch(url + 'essay/' + id + parameter);
 /**
- * 获取连载数据
+ * 获取 <连载> 数据
  */
 export const serialContent = id => fetch(url + 'serialcontent/' + id + parameter);
+/**
+ * 获取 <问答> 数据
+ */
+export const questionContent = id => fetch(url + 'question/detail/' + id + parameter);
+/**
+ * 获取 <音乐> 数据
+ */
+export const musicContent = id => fetch(url + 'music/detail/' + id + parameter);
+
 /**
  * 获取评论数据
  */
 export const discussDatas = (id, query) => fetch(url + 'comment/praiseandtime' + query + '/' + id + '/0?');
-/**
- * 获取音乐数据
- */
-export const musicContent = id => fetch(url + 'music/detail/' + id + parameter);
 //请求今天的数据
 export function getNowDatas() {
     let url = 'http://v3.wufazhuce.com:8000/api/channel/one/0/0?' + parameter;

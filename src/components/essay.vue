@@ -6,7 +6,6 @@
                 文 / {{data.author_list[0].user_name}}
             </div>
             <div class="audio_read" v-if="data.audio" @click="playAudio">
-                <!-- <audio :src="data.audio" ref="readAudio" @timeupdate="timeupdate"></audio> -->
                 <img class="isPlay" :src="iconPlay" alt="">
                 <span>有声阅读 | {{data.anchor}}</span>
                 <span class="audio_time">{{audioTime}}</span>
@@ -24,6 +23,7 @@ import { mapMutations, mapState } from 'vuex'
 import { essayContent, discussDatas } from '../service/getData'
 import authorView from './authorView'
 import discussView from './discussView'
+import { add2Zero } from '../base/utils'
 
 export default {
     data() {
@@ -47,9 +47,9 @@ export default {
         ]),
         audioTime() {
             if (this.timeCount) {
-                return this.add2Zero(this.timeCount)
+                return add2Zero(this.timeCount)
             } else {
-                return this.add2Zero(this.data.audio_duration)
+                return add2Zero(this.data.audio_duration)
             }
         },
         iconPlay() {
@@ -58,7 +58,7 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'GAIN_AUDIO', 'READ_AUDIO_STATUS'
+            'GAIN_AUDIO', 'GAIN_AUDIO_NAME', 'GAIN_AUDIO_AUTHOR', 'READ_AUDIO_STATUS'
         ]),
         initData() {
             this.content_id = this.$route.query.id;
@@ -76,26 +76,15 @@ export default {
         },
         playAudio() {
             this.GAIN_AUDIO(this.audio)
+            this.GAIN_AUDIO_NAME(this.data.anchor)
+            this.GAIN_AUDIO_AUTHOR(this.data.hp_title)
             this.READ_AUDIO_STATUS(!this.readAudioStatus)
         },
-        add2Zero(v) {
-            let m = v / 60 | 0
-            m = m < 10 ? '0' + m : '' + m
-            let s = v % 60
-            s = s < 10 ? '0' + s : '' + s
-            return m + ":" + s
-        },
-        // timeupdate() {
-        //     this.timeCount = Math.floor(this.data.audio_duration - this.audioCurrentTime);
-        // }
     },
     watch: {
         audioCurrentTime() {
             this.timeCount = Math.floor(this.data.audio_duration - this.audioCurrentTime)
-        },
-        // isPlay() {
-        //     this.iconPlay = this.isPlay ? '../static/img/contentAudioPlaying@2x.png' : '../static/img/contentAudioPause@2x.png'
-        // }
+        }
     }
 
 }

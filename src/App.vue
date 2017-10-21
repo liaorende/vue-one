@@ -5,8 +5,9 @@
     </keep-alive>
     <mini-player :show="show" @showPlayer="showPlayer"></mini-player>
     <router-view v-if="!$route.meta.keepAlive"></router-view>
-    <!-- <audio ref="audio" :src="audioSrc" @timeupdate="timeupdate"></audio> -->
-    <img @click="showPlayer(true)" class="miniBackstage" src="./assets/img/MusicFeedsPlaceHolder@2x.png" alt="">
+    <transition name="shift-in">
+      <img v-if="audioSrc" @click="showPlayer(true)" class="miniBackstage" src="./assets/img/MusicFeedsPlaceHolder@2x.png" alt="">
+    </transition>
     <!-- <footer id="footer"></footer> -->
   </div>
 </template>
@@ -27,6 +28,7 @@
 })(document, window)
 
 import miniPlayer from './components/miniPlayer'
+import { mapState } from 'vuex'
 export default {
   name: 'app',
   data() {
@@ -37,6 +39,11 @@ export default {
   },
   components: {
     miniPlayer
+  },
+  computed: {
+    ...mapState([
+      'audioSrc'
+    ])
   },
   methods: {
     showPlayer(v) {
@@ -88,12 +95,21 @@ export default {
   background-size: 0.8rem
 }
 
-
 .miniBackstage {
   position: fixed;
   top: 2rem;
-  right: -10px;
+  right: -20px;
   z-index: 998;
   width: 40px;
+}
+
+.shift-in-enter-active,
+.shift-in-leave-active {
+  transition: all .4s;
+}
+
+.shift-in-enter,
+.shift-in-leave-to {
+  right: -60px;
 }
 </style>

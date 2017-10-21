@@ -8,6 +8,7 @@ import essay from '@/components/essay'
 import music from '@/components/music'
 import movie from '@/components/movie'
 import serial from '@/components/serial/serial'
+import question from '@/components/question'
 Vue.use(Router)
 Vue.use(fetch)
 export default new Router({
@@ -46,6 +47,10 @@ export default new Router({
     {
       path: '/movie',
       component: movie
+    },
+    {
+      path: '/question',
+      component: question
     }
   ],
   // scrollBehavior(to, from, savedPosition) {
